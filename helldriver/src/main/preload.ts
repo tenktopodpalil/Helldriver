@@ -25,5 +25,8 @@ const electronHandler = {
 };
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
+contextBridge.exposeInMainWorld('api', {
+  getAPI: () => ipcRenderer.invoke('fetch-API')
+});
 
 export type ElectronHandler = typeof electronHandler;

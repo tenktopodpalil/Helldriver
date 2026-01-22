@@ -31,6 +31,17 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
+ipcMain.handle('fetch-API', async () => {
+  const res = await fetch(
+    'https://api.live.prod.thehelldiversgame.com/api/v2/Assignment/War/801',{
+      headers: {
+        'Accept-Language': 'pl-PL'
+      }
+    }
+  );
+  return res.json();
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

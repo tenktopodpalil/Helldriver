@@ -1,8 +1,19 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { MemoryRouter as Router, Routes, Route, data } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import './App.css';
+import fetchNurkiAPI from '../main/API';
+import { use, useState } from 'react';
 
 function Hello() {
+  const [text,setText] = useState<string>('');
+// renderer.js
+
+async function fetchAPIData() {
+  const data = await window.api.getAPI();
+  console.log(data[0].setting.overrideBrief);
+  setText(data[0].setting.overrideBrief);
+}
+fetchAPIData();
   return (
     <div>
       <div className="Hello">
@@ -17,9 +28,9 @@ function Hello() {
         >
           <button type="button">
             <span role="img" aria-label="books">
-              📚
+              📚{text}
             </span>
-            I NEED STIMS!!!
+            
           </button>
         </a>
         <a
