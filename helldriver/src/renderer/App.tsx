@@ -19,7 +19,7 @@ function Hello() {
             <span role="img" aria-label="books">
               📚
             </span>
-            Read our docs
+            I NEED STIMS!!!
           </button>
         </a>
         <a
