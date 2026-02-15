@@ -14,4 +14,5 @@ https://api.helldivers2.dev/raw/api/WarSeason/801/Status  (potrzebne headery "X-
 
 docs - https://electron-react-boilerplate.js.org/docs/installation
 
-npm start
+
+cd helldriver - npm install - npm start
