@@ -1,8 +1,11 @@
-import { MemoryRouter as Router, Routes, Route, data } from 'react-router-dom';
+import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
+import MapBackground from '../../assets/stars-galaxy-3840x2160-10307.jpg';
 import './App.css';
 import fetchNurkiAPI from '../main/API';
-import { use, useState } from 'react';
+import { use, useState, useRef, useEffect } from 'react';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 function Hello() {
   const [text,setText] = useState<string>('');
@@ -42,19 +45,79 @@ fetchAPIData();
             <span role="img" aria-label="folded hands">
               🙏
             </span>
-            Donate
+            Donate 
           </button>
         </a>
       </div>
     </div>
   );
 }
+//
 
+function MapComponent() {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);;
+
+  useEffect(() => {
+    if (mapRef.current) return; // prevent double init
+    if (!mapContainerRef.current) return;
+
+const MIN = 0;
+const MAX = 1;
+
+mapRef.current = new maplibregl.Map({
+  container: mapContainerRef.current,
+  style: {
+    version: 8,
+    sources: {
+      bg: {
+        type: 'image',
+        url: MapBackground,
+        coordinates: [
+          [MIN, MAX],
+          [MAX, MAX],
+          [MAX, MIN],
+          [MIN, MIN]
+        ]
+      }
+    },
+    layers: [
+      {
+        id: 'bg',
+        type: 'raster',
+        source: 'bg'
+      }
+    ]
+  },
+  center: [0.5, 0.5],
+  zoom: 0,
+  maxBounds: [
+    [MIN, MIN],
+    [MAX, MAX]
+  ]
+});
+
+    
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  return (
+    <div style={{ width: '100vw', height: '100vh' }}>
+      <div
+        ref={mapContainerRef}
+        style={{ width: '100%', height: '100%' }}
+      />
+    </div>
+  );
+}
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<MapComponent />} />
       </Routes>
     </Router>
   );

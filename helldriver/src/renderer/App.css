@@ -18,7 +18,9 @@ body {
   justify-content: center;
   align-items: center;
 }
-
+.maplibregl-map{
+  background-image: url(../../assets/stars-galaxy-3840x2160-10307.jpg);
+}
 button {
   background-color: white;
   padding: 10px 20px;
