@@ -1,6 +1,6 @@
 import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
-import MapBackground from '../../assets/stars-galaxy-3840x2160-10307.jpg';
+import MapBackground from '../../assets/circle_PNG63.png';
 import './App.css';
 import fetchNurkiAPI from '../main/API';
 import { use, useState, useRef, useEffect } from 'react';
@@ -89,8 +89,10 @@ mapRef.current = new maplibregl.Map({
       }
     ]
   },
-  center: [0.5, 0.5],
+  center: [0, 0],
   zoom: 0,
+  bearing: 0,
+  pitch: 40,
   maxBounds: [
     [MIN, MIN],
     [MAX, MAX]
