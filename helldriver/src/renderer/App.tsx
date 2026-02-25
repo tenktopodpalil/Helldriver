@@ -2,21 +2,30 @@ import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-
 import icon from '../../assets/icon.svg';
 import MapBackground from '../../assets/circle_PNG63.png';
 import './App.css';
-import fetchNurkiAPI from '../main/API';
 import { use, useState, useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
+/**
+* Fetches data from the Helldivers API.
+* https://api.live.prod.thehelldiversgame.com/api/{endpoint}
+*
+* @param endpoint API endpoint (example: "v2/Assignment/War/801")
+* @returns Parsed JSON response from the API
+*/
+async function fetchAPIData(endpoint: string) {
+
+  const data = await window.api.getAPI(endpoint);
+  //console.log(data[0].setting.overrideBrief);
+  console.log(data);
+  
+}
 function Hello() {
   const [text,setText] = useState<string>('');
 // renderer.js
 
-async function fetchAPIData() {
-  const data = await window.api.getAPI();
-  console.log(data[0].setting.overrideBrief);
-  setText(data[0].setting.overrideBrief);
-}
-fetchAPIData();
+
+fetchAPIData(text);
   return (
     <div>
       <div className="Hello">
@@ -55,9 +64,11 @@ fetchAPIData();
 //
 
 function MapComponent() {
+  
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);;
-
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  
+  const g = fetchAPIData('v2/Assignment/War/801');
   useEffect(() => {
     if (mapRef.current) return; // prevent double init
     if (!mapContainerRef.current) return;

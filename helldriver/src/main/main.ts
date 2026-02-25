@@ -31,9 +31,12 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.handle('fetch-API', async () => {
+ipcMain.handle('fetch-API', async (_event, endpoint) => {
+  console.log('type:', typeof endpoint);
+  console.log('raw:', endpoint);
   const res = await fetch(
-    'https://api.live.prod.thehelldiversgame.com/api/v2/Assignment/War/801',{
+    //https://api.live.prod.thehelldiversgame.com/api/v2/Assignment/War/801
+    `https://api.live.prod.thehelldiversgame.com/api/${endpoint}`,{
       headers: {
         'Accept-Language': 'pl-PL'
       }

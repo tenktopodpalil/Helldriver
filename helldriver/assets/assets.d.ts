@@ -33,3 +33,28 @@ declare module '*.css' {
   const content: Styles;
   export default content;
 }
+export {};
+
+declare global {
+  interface Window {
+    api: {
+      /**
+       * Fetches data from the Helldivers API.
+       * https://api.live.prod.thehelldiversgame.com/api/{endpoint}
+       *
+       * @param endpoint API endpoint (example: "v2/Assignment/War/801")
+       * @returns Parsed JSON response from the API
+       */
+      getAPI(endpoint: string): Promise<any>;
+    },
+    fetchAPIData: {
+            /**
+       * Fetches data from the Helldivers API.
+       * https://api.live.prod.thehelldiversgame.com/api/{endpoint}
+       *
+       * @param endpoint API endpoint (example: "v2/Assignment/War/801")
+       * @returns Parsed JSON response from the API
+       */
+    };
+  }
+}
