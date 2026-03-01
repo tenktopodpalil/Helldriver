@@ -17,7 +17,7 @@ async function fetchAPIData(endpoint: string) {
 
   const data = await window.api.getAPI(endpoint);
   //console.log(data[0].setting.overrideBrief);
-  console.log(data);
+  return data;
   
 }
 function Hello() {
@@ -67,12 +67,19 @@ function MapComponent() {
   
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  
+  const [apiData, setApiData] = useState<any>(null);
+
   const g = fetchAPIData('v2/Assignment/War/801');
+    useEffect(() => {
+    fetchAPIData('v2/Assignment/War/801').then((data) => {
+      setApiData(data);
+      console.log(data);
+    });
+  }, []);
   useEffect(() => {
     if (mapRef.current) return; // prevent double init
     if (!mapContainerRef.current) return;
-
+console.log(apiData?.d?.apiData);
 const MIN = 0;
 const MAX = 1;
 
