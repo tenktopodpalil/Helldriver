@@ -69,11 +69,11 @@ function MapComponent() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [apiData, setApiData] = useState<any>(null);
 
-  const g = fetchAPIData('v2/Assignment/War/801');
     useEffect(() => {
-    fetchAPIData('v2/Assignment/War/801').then((data) => {
+    fetchAPIData('WarSeason/801/WarInfo').then((data) => {
       setApiData(data);
-      console.log(data);
+      console.log(data.planetInfos);
+      mapRef.current?.on
     });
   }, []);
   useEffect(() => {
@@ -116,6 +116,7 @@ mapRef.current = new maplibregl.Map({
     [MAX, MAX]
   ]
 });
+
 
     
     return () => {
