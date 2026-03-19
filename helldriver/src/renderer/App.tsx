@@ -52,10 +52,10 @@ mapRef.current = new maplibregl.Map({
         type: 'image',
         url: MapBackground,
         coordinates: [
-          [MIN, MAX],
-          [MAX, MAX],
-          [MAX, MIN],
-          [MIN, MIN]
+          [MIN+0.2, MAX-0.2],
+          [MAX-0.2, MAX-0.2],
+          [MAX-0.2, MIN+0.2],
+          [MIN+0.2, MIN+0.2]
         ]
       }
     },
@@ -68,7 +68,7 @@ mapRef.current = new maplibregl.Map({
     ]
   },
   center: [0.5, 0.5],
-  zoom: 11,
+  zoom: 7,
   bearing: 0,
   pitch: 40,
   maxBounds: [
@@ -88,14 +88,24 @@ mapRef.current.on('load', async () => {
   const image = await map.loadImage(Super_Ziemia);
   map.addImage('custom-marker', image.data);
 
-  const el = document.createElement('img');
-  el.src = Super_Ziemia;
-  el.style.width = '32px';  
-  el.style.height = '32px';
+const markerEl = document.createElement('img');
+markerEl.src = Super_Ziemia;
+markerEl.style.width = '32px';
+markerEl.style.height = '32px';
 
-  new maplibregl.Marker({ element: el })
-    .setLngLat([0.5, 0.5]) 
-    .addTo(map);
+const marker = new maplibregl.Marker({ element: markerEl, anchor: 'center' })
+  .setLngLat([0.5, 0.5])
+  .addTo(map);
+
+const BASE_ZOOM = 10;   // zoom level where size = BASE_SIZE
+const BASE_SIZE = 28;  // px at BASE_ZOOM
+
+map.on('zoom', () => {
+  const scale = Math.pow(2, map.getZoom() - BASE_ZOOM);
+  const size = BASE_SIZE * scale;
+  markerEl.style.width = `${size}px`;
+  markerEl.style.height = `${size}px`;
+});
 });
     
     return () => {
