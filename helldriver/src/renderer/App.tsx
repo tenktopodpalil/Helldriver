@@ -1,6 +1,7 @@
 import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-router-dom';
 import icon from '../../assets/icon.svg';
 import MapBackground from '../../assets/circle_PNG63.png';
+import Super_Ziemia from '../../assets/Super_Ziemia.png';
 import './App.css';
 import { use, useState, useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
@@ -107,8 +108,8 @@ mapRef.current = new maplibregl.Map({
       }
     ]
   },
-  center: [0, 0],
-  zoom: 0,
+  center: [0.5, 0.5],
+  zoom: 11,
   bearing: 0,
   pitch: 40,
   maxBounds: [
@@ -116,8 +117,43 @@ mapRef.current = new maplibregl.Map({
     [MAX, MAX]
   ]
 });
+// Add the point after the map loads
 
+mapRef.current.on('load', async () => {
+  const map = mapRef.current!;
 
+  const image = await map.loadImage(Super_Ziemia);
+  map.addImage('custom-marker', image.data);
+
+  map.addSource('point', {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [0.5, 0.5] // 👈 replace with your [lng, lat]
+          },
+          properties: {}
+        }
+      ]
+    }
+  });
+
+  map.addLayer({
+    id: 'point',
+    type: 'symbol',
+    source: 'point',
+    layout: {
+      'icon-image': 'custom-marker',
+      'icon-size': 1,
+      'icon-anchor': 'center',
+      'icon-allow-overlap': true
+    }
+  });
+});
     
     return () => {
       mapRef.current?.remove();
