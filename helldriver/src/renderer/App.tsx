@@ -101,28 +101,35 @@ mapRef.current.on('load', async () => {
     console.log(planets);
 
     planets?.forEach((planet: any) => {
+      const upper = document.createElement('div');
+      const el = document.createElement('img');
       if(planet.index === 0) {
-        const el = document.createElement('img');
         el.src = Super_Ziemia;
         el.className = 'Super-Earth';
-        el.style.width = '500px';
-        el.style.height = '500px';
+        el.style.width = '40px';
+        el.style.height = '40px';
 
       }
-     
-      const el = document.createElement('img');
+      else{
       el.src = Super_Ziemia;
       el.className = 'planet';
       el.style.width = '20px';
       el.style.height = '20px';
-      mapRef.current!.on('zoom', () => {
+      }
+      const updateScale = () => {
         const zoom = mapRef.current!.getZoom();
         const scale = Math.pow(2, (zoom - 8) / 2);
         el.style.transform = `${el.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
-      });
-      const marker = new maplibregl.Marker({ element: el })
+      };
+
+      mapRef.current!.on('zoom', updateScale);
+      mapRef.current!.on('zoomend', updateScale);
+      upper.appendChild(el);
+      const marker = new maplibregl.Marker({ element: upper })
         .setLngLat([planet.position.x + 1, planet.position.y + 1])
         .addTo(mapRef.current!);
+
+      updateScale(); // set correct size on init
     });
       
 
