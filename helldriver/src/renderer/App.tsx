@@ -28,6 +28,7 @@ function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [apiData, setApiData] = useState<any>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
 
     useEffect(() => {
     fetchAPIData('WarSeason/801/WarInfo').then((data) => {
@@ -41,7 +42,7 @@ function MapComponent() {
     if (!mapContainerRef.current) return;
 console.log(apiData?.d?.apiData);
 const MIN = 0;
-const MAX = 1;
+const MAX = 2;
 
 mapRef.current = new maplibregl.Map({
   container: mapContainerRef.current,
@@ -79,41 +80,54 @@ mapRef.current = new maplibregl.Map({
 // Add the point after the map loads
 mapRef.current.on('load', async () => {
   const map = mapRef.current!;
+  console.log("fddjd")
+  console.log(apiData);
 
 
+    //Reszta planet
 });
-mapRef.current.on('load', async () => {
-  const map = mapRef.current!;
 
-  const image = await map.loadImage(Super_Ziemia);
-  map.addImage('custom-marker', image.data);
-
-const markerEl = document.createElement('img');
-markerEl.src = Super_Ziemia;
-markerEl.style.width = '32px';
-markerEl.style.height = '32px';
-
-const marker = new maplibregl.Marker({ element: markerEl, anchor: 'center' })
-  .setLngLat([0.5, 0.5])
-  .addTo(map);
-
-const BASE_ZOOM = 10;   // zoom level where size = BASE_SIZE
-const BASE_SIZE = 28;  // px at BASE_ZOOM
-
-map.on('zoom', () => {
-  const scale = Math.pow(2, map.getZoom() - BASE_ZOOM);
-  const size = BASE_SIZE * scale;
-  markerEl.style.width = `${size}px`;
-  markerEl.style.height = `${size}px`;
-});
-});
     
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
+      setIsMapLoaded(true);
     };
   }, []);
+  //planety
+  useEffect(() => {
+    const map = mapRef.current;
+    const planets = apiData?.planetInfos;
+    console.log(planets);
 
+    planets?.forEach((planet: any) => {
+      if(planet.index === 0) {
+        const el = document.createElement('img');
+        el.src = Super_Ziemia;
+        el.className = 'Super-Earth';
+        el.style.width = '500px';
+        el.style.height = '500px';
+
+      }
+     
+      const el = document.createElement('img');
+      el.src = Super_Ziemia;
+      el.className = 'planet';
+      el.style.width = '20px';
+      el.style.height = '20px';
+      mapRef.current!.on('zoom', () => {
+        const zoom = mapRef.current!.getZoom();
+        const scale = Math.pow(2, (zoom - 8) / 2);
+        el.style.transform = `${el.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
+      });
+      const marker = new maplibregl.Marker({ element: el })
+        .setLngLat([planet.position.x + 1, planet.position.y + 1])
+        .addTo(mapRef.current!);
+    });
+      
+
+
+  }, [apiData, isMapLoaded]);
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <div
