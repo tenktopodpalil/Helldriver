@@ -2,6 +2,7 @@ import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-
 import icon from '../../assets/icon.svg';
 import MapBackground from '../../assets/circle_PNG63.png';
 import Super_Ziemia from '../../assets/Super_Ziemia.png';
+import Planet_data from '../../assets/planets/planets.json';
 import './App.css';
 import { use, useState, useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
@@ -98,34 +99,49 @@ mapRef.current.on('load', async () => {
   useEffect(() => {
     const map = mapRef.current;
     const planets = apiData?.planetInfos;
+    
+    type Planet_data_processed = keyof typeof Planet_data;
     console.log(planets);
-
     planets?.forEach((planet: any) => {
-      const upper = document.createElement('div');
-      const el = document.createElement('img');
+      const nazwa = planet.index as Planet_data_processed;
+      const upper = document.createElement('div'); //maplibre handler
+      const container = document.createElement('div'); //true container
+      upper.appendChild(container);
+      const img = document.createElement('img'); //planet image
+      
       if(planet.index === 0) {
-        el.src = Super_Ziemia;
-        el.className = 'Super-Earth';
-        el.style.width = '40px';
-        el.style.height = '40px';
+        img.src = Super_Ziemia;
+        img.className = 'Super-Earth';
+        img.style.width = '40px';
+        img.style.height = '40px';
 
       }
       else{
-      el.src = Super_Ziemia;
-      el.className = 'planet';
-      el.style.width = '20px';
-      el.style.height = '20px';
+      img.src = Super_Ziemia;
+      img.className = 'planet';
+      img.style.width = '20px';
+      img.style.height = '20px';
       }
       const updateScale = () => {
         const zoom = mapRef.current!.getZoom();
         const scale = Math.pow(2, (zoom - 8) / 2);
-        el.style.transform = `${el.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
+        img.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
       };
+      
 
       mapRef.current!.on('zoom', updateScale);
       mapRef.current!.on('zoomend', updateScale);
-      upper.appendChild(el);
-      const marker = new maplibregl.Marker({ element: upper })
+
+      const name = document.createElement('span'); //planet name  ----------------nazwy planet z planets.json
+      name.textContent = Planet_data[nazwa].name;
+      name.className = 'planet-name';
+      
+      console.log(planet);
+      console.log(Planet_data[nazwa].name);
+      container.appendChild(name);
+      container.appendChild(img);
+      
+      const marker = new maplibregl.Marker({ element: container })
         .setLngLat([planet.position.x + 1, planet.position.y + 1])
         .addTo(mapRef.current!);
 
