@@ -54,10 +54,10 @@ mapRef.current = new maplibregl.Map({
         type: 'image',
         url: MapBackground,
         coordinates: [
-          [MIN+0.2, MAX-0.2],
-          [MAX-0.2, MAX-0.2],
-          [MAX-0.2, MIN+0.2],
-          [MIN+0.2, MIN+0.2]
+          [MIN-0.2, MAX+0.2],
+          [MAX+0.2, MAX+0.2],
+          [MAX+0.2, MIN-0.2],
+          [MIN-0.2, MIN-0.2]
         ]
       }
     },
@@ -74,8 +74,8 @@ mapRef.current = new maplibregl.Map({
   bearing: 0,
   pitch: 40,
   maxBounds: [
-    [MIN, MIN],
-    [MAX, MAX]
+    [MIN-1, MIN-1],
+    [MAX+1, MAX+1]
   ]
 });
 // Add the point after the map loads
