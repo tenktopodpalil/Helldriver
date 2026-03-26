@@ -7,6 +7,7 @@ import './App.css';
 import { use, useState, useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import Generate_Hyperlanes from './Hyperlanes';
 
 /**
 * Fetches data from the Helldivers API.
@@ -18,6 +19,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 async function fetchAPIData(endpoint: string) {
 
   const data = await window.api.getAPI(endpoint);
+  
   //console.log(data[0].setting.overrideBrief);
   return data;
   
@@ -29,6 +31,7 @@ function MapComponent() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [apiData, setApiData] = useState<any>(null);
+  const [WarapiData, setWarApiData] = useState<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
     useEffect(() => {
@@ -37,6 +40,12 @@ function MapComponent() {
       console.log(data.planetInfos);
       mapRef.current?.on
     });
+    fetchAPIData('WarSeason/801/Status').then((Wardata) => {
+      setWarApiData(Wardata);
+      console.log(Wardata);
+      mapRef.current?.on
+    });
+    
   }, []);
   useEffect(() => {
     if (mapRef.current) return; // prevent double init
@@ -72,6 +81,7 @@ mapRef.current = new maplibregl.Map({
   center: [0.5, 0.5],
   zoom: 7,
   bearing: 0,
+  maxZoom: 12,
   pitch: 40,
   maxBounds: [
     [MIN-1, MIN-1],
@@ -79,14 +89,6 @@ mapRef.current = new maplibregl.Map({
   ]
 });
 // Add the point after the map loads
-mapRef.current.on('load', async () => {
-  const map = mapRef.current!;
-  console.log("fddjd")
-  console.log(apiData);
-
-
-    //Reszta planet
-});
 
     
     return () => {
@@ -99,47 +101,119 @@ mapRef.current.on('load', async () => {
   useEffect(() => {
     const map = mapRef.current;
     const planets = apiData?.planetInfos;
+    const Wardata = WarapiData;
     
     type Planet_data_processed = keyof typeof Planet_data;
-    console.log(planets);
+    //console.log(planets);
     planets?.forEach((planet: any) => {
       const nazwa = planet.index as Planet_data_processed;
+      let BASE_SIZE
       const upper = document.createElement('div'); //maplibre handler
       const container = document.createElement('div'); //true container
-      upper.appendChild(container);
-      const img = document.createElement('img'); //planet image
       
+      container.style.display = 'flex';
+      container.style.flexDirection = 'column';
+      container.style.alignItems = 'center';
+      container.style.gap = '4px';
+      const img = document.createElement('img'); //planet image
+      const imgWrapper = document.createElement('div');  // wraps the image 
+
+      let zoom = mapRef.current!.getZoom();
+      let scale = Math.pow(2, (zoom - 8) / 2);
+      const name = document.createElement('span'); //planet name  ----------------nazwy planet z planets.json
+      name.textContent = Planet_data[nazwa].name;
+      name.className = 'planet-name';
+      name.style = `font-size: 15px`
+      name.style.opacity = '0';
+      name.style.transition = 'opacity 0.7s ease';
+      name.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
+
+      //determine special places
       if(planet.index === 0) {
         img.src = Super_Ziemia;
+        BASE_SIZE = 40;
         img.className = 'Super-Earth';
-        img.style.width = '40px';
-        img.style.height = '40px';
+        img.style.width = BASE_SIZE + "px";
+        img.style.height = BASE_SIZE + "px";
 
       }
       else{
-      img.src = Super_Ziemia;
-      img.className = 'planet';
-      img.style.width = '20px';
-      img.style.height = '20px';
+        if(Planet_data[nazwa].name==""){
+          BASE_SIZE = 0;
+          img.src=""
+          img.className="empty"
+          img.style.width = '0px';
+          img.style.height = '0px'; 
+        }
+        else{
+        BASE_SIZE = 20;
+        img.src = Super_Ziemia;
+        img.className = 'planet';
+        img.style.width = BASE_SIZE + "px";
+        img.style.height = BASE_SIZE + "px"; 
+           }
       }
+
+      //faction logic
+
+      if(Wardata.planetStatus[planet.index].owner == 1){
+
+      }
+      switch (Wardata.planetStatus[planet.index].owner) {
+          case 1:
+            // do something
+            break;
+          case 2:
+            name.style.color='yellow'
+            console.log("bug")
+            break;
+          case 3:
+            name.style.color='#b60000'
+            console.log("bot")
+            break;
+          case 4:
+            name.style.color='#ab00fd'
+            console.log("bot")
+            break;
+          default:
+            console.log("nuh uh")
+            console.log(Wardata.planetStatus[planet.index].owner)
+            break;
+        }
+
+
+      //zoom logic
       const updateScale = () => {
-        const zoom = mapRef.current!.getZoom();
-        const scale = Math.pow(2, (zoom - 8) / 2);
+        scale = Math.pow(2, (zoom - 8) / 2);
+        zoom = mapRef.current!.getZoom();
         img.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
+
       };
-      
+
+      imgWrapper.style.width = `${BASE_SIZE}px`;
+      imgWrapper.style.height = `${BASE_SIZE}px`;
+      imgWrapper.style.display = 'flex';
+      imgWrapper.style.alignItems = 'center';
+      imgWrapper.style.justifyContent = 'center';
+      imgWrapper.style.overflow = 'visible';
 
       mapRef.current!.on('zoom', updateScale);
       mapRef.current!.on('zoomend', updateScale);
 
-      const name = document.createElement('span'); //planet name  ----------------nazwy planet z planets.json
-      name.textContent = Planet_data[nazwa].name;
-      name.className = 'planet-name';
+      mapRef.current!.on('zoomend', () => {
+        const zoom = mapRef.current!.getZoom();
+        check_Name_Visibility(zoom, name);
+      });
+
+
       
-      console.log(planet);
-      console.log(Planet_data[nazwa].name);
+      //console.log(planet);
+     // console.log(Planet_data[nazwa].name);
+      imgWrapper.appendChild(img);
+      
+      container.appendChild(imgWrapper);
       container.appendChild(name);
-      container.appendChild(img);
+      upper.appendChild(container);
       
       const marker = new maplibregl.Marker({ element: container })
         .setLngLat([planet.position.x + 1, planet.position.y + 1])
@@ -147,6 +221,17 @@ mapRef.current.on('load', async () => {
 
       updateScale(); // set correct size on init
     });
+    const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
+      if(CurZoom <= 9.8){
+        name.style.opacity = '0';
+        console.log("ppo") 
+      }
+      else{
+        console.log("oop");
+        name.style.opacity = '1';
+      }
+
+    }
       
 
 
