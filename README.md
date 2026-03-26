@@ -9,7 +9,7 @@ Tech stack:
 * GSAP - animations
 
 
-przestrzeń wroga to blob ich koloru emanujący z zajętych planet
+przestrzeń wroga to blob ich koloru emanujący z zajętych planet:
 *Oświeceni - filotewa mgła + void
 *Automatony - niesprecyzowana czerwona brutalistyczna przesztrzeń na której końcu jest naimacja zębatek fadująca poza mapę
 *terminidy - gloom + niesprecyzowana żółta przestrzeń
