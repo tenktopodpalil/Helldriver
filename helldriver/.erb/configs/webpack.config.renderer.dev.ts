@@ -78,6 +78,7 @@ const configuration: webpack.Configuration = {
         ],
         include: /\.module\.s?(c|a)ss$/,
       },
+      
       {
         test: /\.s?css$/,
         use: ['style-loader', 'css-loader', 'sass-loader'],
@@ -90,7 +91,7 @@ const configuration: webpack.Configuration = {
       },
       // Images
       {
-        test: /\.(png|jpg|jpeg|gif)$/i,
+        test: /\.(png|jpg|jpeg|gif|webp)$/i,
         type: 'asset/resource',
       },
       // SVG

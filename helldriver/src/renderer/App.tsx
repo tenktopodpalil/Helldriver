@@ -7,7 +7,10 @@ import './App.css';
 import { use, useState, useRef, useEffect } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import Generate_Hyperlanes from './Hyperlanes';
+import generate_Hyperlanes from './Hyperlanes';
+import { Console } from 'console';
+import { planetIcons } from './PlanetIconImport';
+import swampBase from '../../assets/planets/planet_icons/swamp_base.png';
 
 /**
 * Fetches data from the Helldivers API.
@@ -105,6 +108,7 @@ mapRef.current = new maplibregl.Map({
     
     type Planet_data_processed = keyof typeof Planet_data;
     //console.log(planets);
+    console.log(Planet_data[259].biome);
     planets?.forEach((planet: any) => {
       const nazwa = planet.index as Planet_data_processed;
       let BASE_SIZE
@@ -122,6 +126,7 @@ mapRef.current = new maplibregl.Map({
       let scale = Math.pow(2, (zoom - 8) / 2);
       const name = document.createElement('span'); //planet name  ----------------nazwy planet z planets.json
       name.textContent = Planet_data[nazwa].name;
+
       name.className = 'planet-name';
       name.style = `font-size: 15px`
       name.style.opacity = '0';
@@ -147,7 +152,7 @@ mapRef.current = new maplibregl.Map({
         }
         else{
         BASE_SIZE = 20;
-        img.src = Super_Ziemia;
+        img.src = `${planetIcons[Planet_data[nazwa].biome]}`;
         img.className = 'planet';
         img.style.width = BASE_SIZE + "px";
         img.style.height = BASE_SIZE + "px"; 
@@ -221,8 +226,10 @@ mapRef.current = new maplibregl.Map({
 
       updateScale(); // set correct size on init
     });
+    //generate hyperlanes
+    generate_Hyperlanes(planets,mapRef.current!);
     const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
-      if(CurZoom <= 9.8){
+      if(CurZoom <= 9.0){
         name.style.opacity = '0';
         console.log("ppo") 
       }
@@ -232,6 +239,7 @@ mapRef.current = new maplibregl.Map({
       }
 
     }
+
       
 
 

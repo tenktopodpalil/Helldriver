@@ -1,3 +1,6 @@
-export default function Generate_Hyperlanes(data:any){
+import maplibregl from 'maplibre-gl';
+
+export default function generateHyperlanes(planets: any, map: maplibregl.Map) 
+{
 
 }
