@@ -157,6 +157,16 @@ mapRef.current = new maplibregl.Map({
         img.style.width = BASE_SIZE + "px";
         img.style.height = BASE_SIZE + "px"; 
         }
+      else if(planet.index === 51 || planet.index === 85 || planet.index === 127){
+        //fractured planets
+          BASE_SIZE = 20;
+          console.log(Planet_data[nazwa].name)
+          console.log(`${Planet_data[64].biome}`);
+          img.src=`${planetIcons["fractured_planet"]}`;
+          img.className="fractured_planet"
+        img.style.width = BASE_SIZE + "px";
+        img.style.height = BASE_SIZE + "px"; 
+        }
       else if(planet.index === 64){
         //meridia
           BASE_SIZE = 20;

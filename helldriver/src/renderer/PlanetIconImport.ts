@@ -22,6 +22,7 @@ import superEarth from '../../assets/planets/planet_icons/super_earth.png';
 import swampBase from '../../assets/planets/planet_icons/swamp_base.png';
 import swampHaunted from '../../assets/planets/planet_icons/swamp_haunted.png';
 import unknown from '../../assets/planets/planet_icons/unknown.webp';
+import fractured_planet from '../../assets/planets/planet_icons/fractured_planet.png';
 
 export const planetIcons: Record<string, string> = {
   arctic_glacier_base: arcticGlacierBase,
@@ -47,4 +48,5 @@ export const planetIcons: Record<string, string> = {
   swamp_base: swampBase,
   swamp_haunted: swampHaunted,
   unknown: unknown,
+  fractured_planet: fractured_planet
 };
