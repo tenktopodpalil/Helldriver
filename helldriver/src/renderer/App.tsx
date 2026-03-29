@@ -84,7 +84,7 @@ mapRef.current = new maplibregl.Map({
   center: [0.5, 0.5],
   zoom: 7,
   bearing: 0,
-  maxZoom: 12,
+  maxZoom: 11,
   pitch: 40,
   maxBounds: [
     [MIN-1, MIN-1],
@@ -128,22 +128,44 @@ mapRef.current = new maplibregl.Map({
       name.textContent = Planet_data[nazwa].name;
 
       name.className = 'planet-name';
-      name.style = `font-size: 15px`
+      name.style = `font-size: 0.9rem`
       name.style.opacity = '0';
+      name.style.color = 'white';
+      name.style.webkitTextStroke = '0.2px black';
+      name.style.textShadow = '0 0 1px black';
       name.style.transition = 'opacity 0.7s ease';
       name.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
 
-      //determine special places
       if(planet.index === 0) {
+        //super ziemia
         img.src = Super_Ziemia;
-        BASE_SIZE = 40;
+        BASE_SIZE = 50;
         img.className = 'Super-Earth';
         img.style.width = BASE_SIZE + "px";
         img.style.height = BASE_SIZE + "px";
 
       }
-      else{
-        if(Planet_data[nazwa].name==""){
+      else if(planet.index === 115){
+        //penta
+          BASE_SIZE = 20;
+          console.log(Planet_data[nazwa].name)
+          console.log(`${Planet_data[64].biome}`);
+          img.src=`${planetIcons[Planet_data[64].biome]}`;
+          img.className="black_hole_penta"
+        img.style.width = BASE_SIZE + "px";
+        img.style.height = BASE_SIZE + "px"; 
+        }
+      else if(planet.index === 64){
+        //meridia
+          BASE_SIZE = 20;
+          console.log(Planet_data[nazwa].name)
+          console.log(`${Planet_data[64].biome}`);
+          img.src=`${planetIcons[Planet_data[64].biome]}`;
+          img.className="black_hole_penta"
+        img.style.width = BASE_SIZE + "px";
+        img.style.height = BASE_SIZE + "px"; 
+        }
+      else if(Planet_data[nazwa].name==""){
           BASE_SIZE = 0;
           img.src=""
           img.className="empty"
@@ -151,13 +173,13 @@ mapRef.current = new maplibregl.Map({
           img.style.height = '0px'; 
         }
         else{
-        BASE_SIZE = 20;
+        BASE_SIZE = 15;
         img.src = `${planetIcons[Planet_data[nazwa].biome]}`;
         img.className = 'planet';
         img.style.width = BASE_SIZE + "px";
         img.style.height = BASE_SIZE + "px"; 
            }
-      }
+      
 
       //faction logic
 
@@ -170,18 +192,14 @@ mapRef.current = new maplibregl.Map({
             break;
           case 2:
             name.style.color='yellow'
-            console.log("bug")
             break;
           case 3:
             name.style.color='#b60000'
-            console.log("bot")
             break;
           case 4:
             name.style.color='#ab00fd'
-            console.log("bot")
             break;
           default:
-            console.log("nuh uh")
             console.log(Wardata.planetStatus[planet.index].owner)
             break;
         }
@@ -220,10 +238,18 @@ mapRef.current = new maplibregl.Map({
       container.appendChild(name);
       upper.appendChild(container);
       
+      if(planet.index !=64) {
       const marker = new maplibregl.Marker({ element: container })
         .setLngLat([planet.position.x + 1, planet.position.y + 1])
         .addTo(mapRef.current!);
-
+      }
+      else{
+        //pozycja meridii w grze jest inna niż w api, więc trzeba to poprawić ręcznie
+        const marker = new maplibregl.Marker({ element: container })
+        .setLngLat([0.269 + 1, 0.116 + 1])
+        .addTo(mapRef.current!);
+      }
+      
       updateScale(); // set correct size on init
     });
     //generate hyperlanes
