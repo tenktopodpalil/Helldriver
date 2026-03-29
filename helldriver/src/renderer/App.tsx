@@ -132,17 +132,19 @@ mapRef.current = new maplibregl.Map({
       name.style.opacity = '0';
       name.style.color = 'white';
       name.style.webkitTextStroke = '0.2px black';
-      name.style.textShadow = '0 0 1px black';
       name.style.transition = 'opacity 0.7s ease';
       name.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
 
       if(planet.index === 0) {
         //super ziemia
-        img.src = Super_Ziemia;
+        img.src = `${planetIcons[Planet_data[0].biome]}`;
         BASE_SIZE = 50;
         img.className = 'Super-Earth';
-        img.style.width = BASE_SIZE + "px";
-        img.style.height = BASE_SIZE + "px";
+        img.style.width = 43 + "px";
+        img.style.height = 53 + "px";
+        img.style.transformOrigin = 'bottom center';
+        name.style.textShadow = `#ffcc00 1px 0 10px`;
+        
 
       }
       else if(planet.index === 115){
@@ -178,6 +180,7 @@ mapRef.current = new maplibregl.Map({
         img.className = 'planet';
         img.style.width = BASE_SIZE + "px";
         img.style.height = BASE_SIZE + "px"; 
+        img.style.transformOrigin = 'bottom center';
            }
       
 
@@ -210,7 +213,8 @@ mapRef.current = new maplibregl.Map({
         scale = Math.pow(2, (zoom - 8) / 2);
         zoom = mapRef.current!.getZoom();
         img.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
-
+        name.style.fontSize= `${0.58 * Math.sqrt(scale)}rem`;
+        
       };
 
       imgWrapper.style.width = `${BASE_SIZE}px`;
