@@ -11,7 +11,7 @@ import moorTundra from '../../assets/planets/planet_icons/moor_tundra.png';
 import primordialBase from '../../assets/planets/planet_icons/primordial_base.png';
 import primordialBlue from '../../assets/planets/planet_icons/primordial_blue.png';
 import primordialBug from '../../assets/planets/planet_icons/primordial_bug.webp';
-import primordialDead from '../../assets/planets/planet_icons/primordial_dead.webp';
+import primordialDead from '../../assets/planets/planet_icons/primordial_dead.png';
 import primordialPurple from '../../assets/planets/planet_icons/primordial_purple.png';
 import sandyAcid from '../../assets/planets/planet_icons/sandy_acid.png';
 import sandyBase from '../../assets/planets/planet_icons/sandy_base.png';

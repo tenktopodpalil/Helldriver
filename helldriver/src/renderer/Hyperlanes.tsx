@@ -4,8 +4,8 @@ export default function generateHyperlanes(planet: any, map: maplibregl.Map,plan
 {
     //console.log(planet.waypoints.length);
 if(planet.waypoints.length >= 1){
-    console.log("Generating hyperlanes for planet: " + planet.index);
-    console.log(planet)
+    //console.log("Generating hyperlanes for planet: " + planet.index);
+   // console.log(planet)
     planet.waypoints.forEach((waypoint: any) => {
         const destination = planets[waypoint].position;
         //console.log("Destination: " + destination.x + ", " + destination.y);
@@ -25,8 +25,8 @@ if (!map.getSource(sourceId)) {
             geometry: {
                 type: 'LineString',
                 coordinates: [
-                    [planet.position.x+1, planet.position.y+1.01],
-                    [destination.x+1, destination.y+1.01]
+                    [planet.position.x+1, planet.position.y+1],
+                    [destination.x+1, destination.y+1]
                 ]
             }
         }
@@ -49,7 +49,7 @@ if (!map.getLayer(layerId)) {
         }
     });
 }
-                console.log(`Hyperlane generated between planet ${planet.index} and waypoint ${waypoint}`);
+                //console.log(`Hyperlane generated between planet ${planet.index} and waypoint ${waypoint}`);
                 
     });
 }

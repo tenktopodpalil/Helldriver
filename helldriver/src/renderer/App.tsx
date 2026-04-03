@@ -11,6 +11,8 @@ import generate_Hyperlanes from './Hyperlanes';
 import { Console } from 'console';
 import { planetIcons } from './PlanetIconImport';
 import swampBase from '../../assets/planets/planet_icons/swamp_base.png';
+import { loadPlanetIcons } from './LoadPlanetIcons';
+import { FeatureCollection, Geometry } from 'geojson';
 
 /**
 * Fetches data from the Helldivers API.
@@ -91,6 +93,12 @@ mapRef.current = new maplibregl.Map({
     [MAX+1, MAX+1]
   ]
 });
+const LoadIcons = async () => 
+  {
+    //await loadPlanetIcons(mapRef.current!);
+  }
+  LoadIcons()
+
 // Add the point after the map loads
 
     
@@ -101,7 +109,7 @@ mapRef.current = new maplibregl.Map({
     };
   }, []);
   //planety
-  useEffect(() => {
+  useEffect(()  => {
     const map = mapRef.current;
     const planets = apiData?.planetInfos;
     const Wardata = WarapiData;
@@ -109,7 +117,114 @@ mapRef.current = new maplibregl.Map({
     type Planet_data_processed = keyof typeof Planet_data;
     //console.log(planets);
     console.log(Planet_data[259].biome);
+
+
+const addPlanetsSource = () => {
+  const geojson: FeatureCollection<Geometry> = {
+    type: 'FeatureCollection',
+    features: planets?.map((planet: any) => {
+      const nazwa = planet.index as Planet_data_processed;
+      return {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [planet.position.x + 1, planet.position.y + 1]
+        },
+        properties: {
+          icon: Planet_data[nazwa].biome,
+          name: Planet_data[nazwa].name
+        }
+      };
+    }) ?? []
+  };
+  console.log("points added")
+  console.log(geojson);
+  map?.addSource('points', {
+    type: 'geojson',
+    data: geojson
+  });
+  
+
+};
+const addPlanetsLayer = (planets : any) => 
+  {
+    const loadIcons = async () => {
+    await loadPlanetIcons(map!);
+    map?.addLayer({
+      id: 'planets-layer',
+      type: 'symbol',
+      source: 'points',
+      layout: {
+        'icon-image': ['get', 'icon'],
+        'icon-size': 0.1,
+        'icon-allow-overlap': true,
+        'text-field': ['get', 'name'], // or any property
+        'text-size': 12,
+        'text-anchor': 'top',
+        'text-offset': [0, 1.2],
+      },
+      paint: {
+        'text-color': '#ffffff',
+        'text-halo-color': '#000000',
+        'text-halo-width': 1
+      }
+    });
+    }
+    loadIcons();
+  }
+
+// If the style is already loaded, add immediately; otherwise wait for it
+if (map?.isStyleLoaded()) {
+  addPlanetsSource();
+  addPlanetsLayer(planets);
+  console.log("map loaded")
+} 
+       
     planets?.forEach((planet: any) => {
+      const nazwa = planet.index as Planet_data_processed;
+map!.addSource(`points${planet.index}`, {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          properties: {  },
+          geometry: { type: 'Point', coordinates: [planet.position.x+1, planet.position.y+1] }
+        }
+      ]
+    }
+  });
+  const loadIcons = async () => {
+    await loadPlanetIcons(map!);
+      map!.addLayer({
+    id: `points-layer${planet.index}`,
+    type: 'symbol',
+    source: `points`,
+    layout: {
+      'icon-image': `${Planet_data[nazwa].biome}`,        // matches the key loaded by loadPlanetIcons
+      'icon-size': 0.11,
+      'icon-anchor': 'bottom',
+      'text-field': Planet_data[nazwa].name,
+      'text-anchor': 'top',
+      'text-offset': [1, 0.5],
+      'text-size': 14,
+      'icon-allow-overlap': true,
+      'text-allow-overlap': true,
+    },
+    paint: {
+      'text-color': '#ffffff',
+      'text-halo-color': '#000000',
+      'text-halo-width': 2,
+    }
+  });;
+  }
+  //loadIcons();
+//console.log(planet);
+//console.log(map!.hasImage(planet.biome));
+//console.log(planetIcons[Planet_data[0].biome]);
+
+      /*
       const nazwa = planet.index as Planet_data_processed;
       let BASE_SIZE
       const upper = document.createElement('div'); //maplibre handler
@@ -262,13 +377,14 @@ mapRef.current = new maplibregl.Map({
         const marker = new maplibregl.Marker({ element: container })
         .setLngLat([0.269 + 1, 0.116 + 1])
         .addTo(mapRef.current!);
+        
       }
-      
-      updateScale(); // set correct size on init
+      */
+      //updateScale(); // set correct size on init
       //generate hyperlanes
       generate_Hyperlanes(planet,mapRef.current!,planets);
     });
-
+    
     const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
       if(CurZoom <= 9.0){
         name.style.opacity = '0';
@@ -281,7 +397,7 @@ mapRef.current = new maplibregl.Map({
 
     }
 
-      
+  
 
 
   }, [apiData, isMapLoaded]);
