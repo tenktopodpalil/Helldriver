@@ -53,7 +53,7 @@ function MapComponent() {
   useEffect(() => {
     if (mapRef.current) return; // prevent double init
     if (!mapContainerRef.current) return;
-console.log(apiData?.d?.apiData);
+
 const MIN = 0;
 const MAX = 2;
 
@@ -265,9 +265,10 @@ mapRef.current = new maplibregl.Map({
       }
       
       updateScale(); // set correct size on init
+      //generate hyperlanes
+      generate_Hyperlanes(planet,mapRef.current!,planets);
     });
-    //generate hyperlanes
-    generate_Hyperlanes(planets,mapRef.current!);
+
     const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
       if(CurZoom <= 9.0){
         name.style.opacity = '0';
