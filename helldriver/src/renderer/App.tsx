@@ -14,6 +14,8 @@ import swampBase from '../../assets/planets/planet_icons/swamp_base.png';
 import { loadPlanetIcons } from './LoadPlanetIcons';
 import { FeatureCollection, Geometry } from 'geojson';
 import { get } from 'http';
+import { features } from 'process';
+import * as turf from '@turf/turf';
 
 /**
 * Fetches data from the Helldivers API.
@@ -133,7 +135,9 @@ const addPlanetsSource = () => {
     console.log(Wardata)
     console.log(Wardata.planetStatus);
     */
+   
       const nazwa = planet.index as Planet_data_processed;
+      
       let x = planet.position.x + 1;
       let y = planet.position.y + 1;
       if(planet.index === 64){
@@ -155,18 +159,79 @@ const addPlanetsSource = () => {
           faction: Wardata.planetStatus[planet.index].owner
         }
       };
-    }) ?? []
+      
+    }
+  ) ?? []
+
   };
   console.log("points added")
   console.log(geojson);
+  
+  geojson.features.push({
+    type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [0.036+1, 0.04+1]
+        },
+        properties: {
+          id: 2137,
+          icon: 'mars',
+          name: 'mars',
+          faction: 1
+        }
+        
+  })
+
+  
   map?.addSource('points', {
     type: 'geojson',
     data: geojson,
     cluster: false
   });
+  const addSectors = () => 
+  {
+    map?.addLayer({
+    id: 'circle-outline',
+    type: 'line',
+    source: 'points',
+    paint: {
+      'line-color': '#007cbf',
+      'line-width': 20
+    }
+  });
+  }
+  addSectors();
   
 
 };
+map?.on('load', () => {
+  map.addSource('circle-source', {
+    type: 'geojson',
+    data: {
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [1, 1] // [lng, lat]
+      },
+      properties: {}
+    }
+  });
+
+  map.addLayer({
+    id: 'circle-layer',
+    type: 'circle',
+    source: 'circle-source',
+    paint: {
+      'circle-pitch-alignment': 'map',  // tilts with the map plane
+  'circle-pitch-scale': 'map',   
+      'circle-radius': 40,        // pixels
+      'circle-color': '#3887be',
+      'circle-opacity': 0.8,
+      'circle-stroke-width': 2,
+      'circle-stroke-color': '#ffffff'
+    }
+  });
+});
 const addPlanetsLayer = (planets : JSON) => 
   {
     const loadIcons = async () => {
@@ -185,6 +250,10 @@ const addPlanetsLayer = (planets : JSON) =>
           127, 'fractured_planet',  //Fractured planet
           64, 'blackhole',         //Meridia
           115, 'blackhole',   //Penta 
+          263, 'unknown',   //Unknown planet
+          264, 'unknown',   //Unknown planet
+          265, 'unknown',   //Unknown planet
+          2137, 'mars',   //Mars
           /* default  */ ['get', 'icon'] 
         ],
         'icon-anchor': 'center',
