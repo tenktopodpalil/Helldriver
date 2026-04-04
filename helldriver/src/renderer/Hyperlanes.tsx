@@ -43,9 +43,9 @@ if (!map.getLayer(layerId)) {
             'line-cap': 'round'
         },
         paint: {
-            'line-color': '#0a5fe7',
-            'line-width': 4,
-            'line-opacity': 1
+            'line-color': '#ffffff',
+            'line-width': 3,
+            'line-opacity': 0.9
         }
     });
 }

@@ -13,6 +13,7 @@ import { planetIcons } from './PlanetIconImport';
 import swampBase from '../../assets/planets/planet_icons/swamp_base.png';
 import { loadPlanetIcons } from './LoadPlanetIcons';
 import { FeatureCollection, Geometry } from 'geojson';
+import { get } from 'http';
 
 /**
 * Fetches data from the Helldivers API.
@@ -86,6 +87,7 @@ mapRef.current = new maplibregl.Map({
   center: [0.5, 0.5],
   zoom: 7,
   bearing: 0,
+  minZoom: 7,
   maxZoom: 11,
   pitch: 40,
   maxBounds: [
@@ -119,20 +121,38 @@ const LoadIcons = async () =>
     console.log(Planet_data[259].biome);
 
 
+
 const addPlanetsSource = () => {
+  
   const geojson: FeatureCollection<Geometry> = {
     type: 'FeatureCollection',
     features: planets?.map((planet: any) => {
+      /*
+          console.log(planets)
+    console.log(WarapiData)
+    console.log(Wardata)
+    console.log(Wardata.planetStatus);
+    */
       const nazwa = planet.index as Planet_data_processed;
+      let x = planet.position.x + 1;
+      let y = planet.position.y + 1;
+      if(planet.index === 64){
+        //pozycja meridii w grze jest inna niż w api, więc trzeba to poprawić ręcznie
+        x += -0.02;
+        
+        
+      }
       return {
         type: 'Feature',
         geometry: {
           type: 'Point',
-          coordinates: [planet.position.x + 1, planet.position.y + 1]
+          coordinates: [x, y]
         },
         properties: {
+          id: planet.index,
           icon: Planet_data[nazwa].biome,
-          name: Planet_data[nazwa].name
+          name: Planet_data[nazwa].name,
+          faction: Wardata.planetStatus[planet.index].owner
         }
       };
     }) ?? []
@@ -141,38 +161,117 @@ const addPlanetsSource = () => {
   console.log(geojson);
   map?.addSource('points', {
     type: 'geojson',
-    data: geojson
+    data: geojson,
+    cluster: false
   });
   
 
 };
-const addPlanetsLayer = (planets : any) => 
+const addPlanetsLayer = (planets : JSON) => 
   {
     const loadIcons = async () => {
     await loadPlanetIcons(map!);
+    
     map?.addLayer({
       id: 'planets-layer',
       type: 'symbol',
       source: 'points',
       layout: {
-        'icon-image': ['get', 'icon'],
-        'icon-size': 0.1,
+        'icon-image': [
+          'match',
+          ['get', 'id'],  
+          51, 'fractured_planet',   //Fractured planet
+          85, 'fractured_planet',   //Fractured planet
+          127, 'fractured_planet',  //Fractured planet
+          64, 'blackhole',         //Meridia
+          115, 'blackhole',   //Penta 
+          /* default  */ ['get', 'icon'] 
+        ],
+        'icon-anchor': 'center',
+        'icon-size': [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+
+          7,
+          ['case', ['==', ['get', 'id'], 0], 0.12, 0.06],
+
+          8,
+          ['case', ['==', ['get', 'id'], 0], 0.12, 0.06],
+
+          12,
+          ['case', ['==', ['get', 'id'], 0], 0.3, 0.18]
+          ],
+        
         'icon-allow-overlap': true,
-        'text-field': ['get', 'name'], // or any property
-        'text-size': 12,
-        'text-anchor': 'top',
-        'text-offset': [0, 1.2],
+        'icon-ignore-placement': true,
+        'text-allow-overlap': true,      // 👈 add this
+        'text-ignore-placement': true ,   // 👈 add this
+        'text-field': [
+        'step',
+        ['zoom'],
+        '',              // 👈 below zoom 6 → no text
+        9, ['get', 'name'] // 👈 from zoom 6+ → show text
+        ], // or any property
+        'text-size': [
+          'case', ['==', ['get', 'id'], 0], 16, 13
+        ],
+        'text-anchor': 'bottom',
+                
+        'text-offset': [
+          'interpolate',
+          ['exponential', 2.2],
+          ['zoom'],
+          8,  ['case', ['==', ['get', 'id'], 0], ['literal', [0, 4.0]], ['literal', [0, 2.5]]],
+          9,   ['case', ['==', ['get', 'id'], 0], ['literal', [0, 4.35]], ['literal', [0, 2.7]]],
+          9.5, ['case', ['==', ['get', 'id'], 0], ['literal', [0, 40.85]], ['literal', [0, 2.9]]],
+          
+          10,  ['case', ['==', ['get', 'id'], 0], ['literal', [0, 5.1]], ['literal', [0, 3.1]]],
+          10.25,  ['case', ['==', ['get', 'id'], 0], ['literal', [0, 5.45]], ['literal', [0, 3.1]]],
+          10.5,['case', ['==', ['get', 'id'], 0], ['literal', [0, 5.65]], ['literal', [0, 3.2]]],
+          10.75,['case', ['==', ['get', 'id'], 0], ['literal', [0, 5.7]], ['literal', [0, 3.2]]],
+          11,  ['case', ['==', ['get', 'id'], 0], ['literal', [0, 5.75]], ['literal', [0, 3.3]]]
+          ],
+        //'text-offset': [0, 1.2],
+        
       },
       paint: {
-        'text-color': '#ffffff',
-        'text-halo-color': '#000000',
-        'text-halo-width': 1
-      }
+        'text-color': [
+          'match',
+          ['get', 'faction'],  
+          2, 'yellow',    
+          3, '#b60000', 
+          4, '#ab00fd',
+          /* default color */ '#ffffff' 
+        ],
+        'text-halo-color': [
+          'match',
+        ['get', 'id'],  
+        0, '#ffcc00',
+          /* default color */ '#000000' 
+        ],
+        'text-halo-width': [
+         'match',
+        ['get', 'id'],  
+        0, 0.4,
+          /* default */ 10 
+        ],
+        'text-opacity': [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        8, 0.5,
+        9, 1
+        ],
+
+        
+      },
+      
     });
     }
     loadIcons();
   }
-
+mapRef.current!.on('zoomend', () => console.log(mapRef.current!.getZoom()));
 // If the style is already loaded, add immediately; otherwise wait for it
 if (map?.isStyleLoaded()) {
   addPlanetsSource();
@@ -182,7 +281,8 @@ if (map?.isStyleLoaded()) {
        
     planets?.forEach((planet: any) => {
       const nazwa = planet.index as Planet_data_processed;
-map!.addSource(`points${planet.index}`, {
+      generate_Hyperlanes(planet,mapRef.current!,planets);
+      map!.addSource(`points${planet.index}`, {
     type: 'geojson',
     data: {
       type: 'FeatureCollection',
@@ -195,6 +295,7 @@ map!.addSource(`points${planet.index}`, {
       ]
     }
   });
+  /*
   const loadIcons = async () => {
     await loadPlanetIcons(map!);
       map!.addLayer({
@@ -219,6 +320,8 @@ map!.addSource(`points${planet.index}`, {
     }
   });;
   }
+  */
+ 
   //loadIcons();
 //console.log(planet);
 //console.log(map!.hasImage(planet.biome));
@@ -382,7 +485,7 @@ map!.addSource(`points${planet.index}`, {
       */
       //updateScale(); // set correct size on init
       //generate hyperlanes
-      generate_Hyperlanes(planet,mapRef.current!,planets);
+      
     });
     
     const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
