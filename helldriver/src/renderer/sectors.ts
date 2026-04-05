@@ -140,7 +140,7 @@ const arc3 = arcCoordinates(
   192,              // start angle (degrees, 0=north, clockwise)
   165,             // end angle
 );
-console.log(arc2);
+
 const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
   type: 'Feature',
   properties: {name: 'Cancri Sector'},
@@ -184,7 +184,7 @@ const arc3 = arcCoordinates(
   193,             // end angle
 );
 
-
+console.log(arc);
 const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
   type: 'Feature',
   properties: {name: 'Gothmar Sector'},
@@ -209,23 +209,30 @@ function CantolusSector(): GeoJSON.Feature<GeoJSON.Polygon> {
 
 const arc2 = arcCoordinates(
   [1, 1],  // centre of the circle your arc curves around
-  23,              // radius
-  223,              // start angle (degrees, 0=north, clockwise)
-  204,               // end angle
+  33.7,              // radius
+  222,              // start angle (degrees, 0=north, clockwise)
+  254,               // end angle
 );
 
 const arc = arcCoordinates(
   [1, 1],  // centre of the circle your arc curves around
-  33.7,              // radius
-  192,              // start angle (degrees, 0=north, clockwise)
-  222,             // end angle
+  23,              // radius
+  204,              // start angle (degrees, 0=north, clockwise)
+  223,            // end angle
 );
 const arc3 = arcCoordinates(
   [1, 1],  // centre of the circle your arc curves around
-  10,              // radius
-  204,              // start angle (degrees, 0=north, clockwise)
-  193,             // end angle
+  23,              // radius
+  255,              // start angle (degrees, 0=north, clockwise)
+  267,            // end angle
 );
+const arc4 = arcCoordinates(
+  [1, 1],  // centre of the circle your arc curves around
+  10,              // radius
+  267,              // start angle (degrees, 0=north, clockwise)
+  204,            // end angle
+);
+
 
 
 const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
@@ -234,13 +241,67 @@ const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
   geometry: {
     type: 'Polygon',
     coordinates: [[
-      [0.937,0.703],
-      ...arc,
-      [0.86,0.8489],
-      ...arc2,
-      [0.96,0.92],
-      ...arc3,
-      
+    [0.96,0.92],
+    [0.915,0.811],
+    ...arc,
+    [0.797,0.775],
+    ...arc2,
+    [0.8,0.947],
+    ...arc3,
+    [0.91, 1.0],
+    ...arc4
+
+    ]],
+  },
+};
+return polygon;
+}
+function IdunSector(): GeoJSON.Feature<GeoJSON.Polygon> {
+
+
+const arc2 = arcCoordinates(
+  [1, 1],  // centre of the circle your arc curves around
+  33.7,              // radius
+  222,              // start angle (degrees, 0=north, clockwise)
+  254,               // end angle
+);
+
+const arc = arcCoordinates(
+  [1, 1],  // centre of the circle your arc curves around
+  23,              // radius
+  204,              // start angle (degrees, 0=north, clockwise)
+  223,            // end angle
+);
+const arc3 = arcCoordinates(
+  [1, 1],  // centre of the circle your arc curves around
+  23,              // radius
+  255,              // start angle (degrees, 0=north, clockwise)
+  267,            // end angle
+);
+const arc4 = arcCoordinates(
+  [1, 1],  // centre of the circle your arc curves around
+  10,              // radius
+  267,              // start angle (degrees, 0=north, clockwise)
+  204,            // end angle
+);
+
+
+
+const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
+  type: 'Feature',
+  properties: {name: 'Idun Sector'},
+  geometry: {
+    type: 'Polygon',
+    coordinates: [[
+    [0.96,0.92],
+    [0.915,0.811],
+    ...arc,
+    [0.797,0.775],
+    ...arc2,
+    [0.8,0.947],
+    ...arc3,
+    [0.91, 1.0],
+    ...arc4
 
     ]],
   },
@@ -248,10 +309,14 @@ const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
 return polygon;
 }
 const altus = AltusSector();
-
+const barnard = BarnardSector();
+const cancri = CancriSector();
+const gothmar = GothmarSector();
+const cantolus = CantolusSector();
+const idun = IdunSector();
 const Sectors: FeatureCollection<Geometry> = {
   type: 'FeatureCollection',
-  features: [altus]
+  features: [ cancri, gothmar,cantolus],
 };
 return Sectors;
 
