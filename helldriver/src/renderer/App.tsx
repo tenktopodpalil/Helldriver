@@ -105,14 +105,30 @@ const LoadIcons = async () =>
   LoadIcons()
 
 // Add the point after the map loads
-
     
+
     return () => {
       mapRef.current?.remove();
       mapRef.current = null;
       setIsMapLoaded(true);
     };
   }, []);
+
+let mouseX = 0;
+let mouseY = 0;
+
+// Track latest mouse position
+document.addEventListener("mousemove", (event) => {
+  mouseX = (event.pageX / window.innerWidth + 0.5); // Normalize X to [0, 1]
+  mouseY =  (event.pageY / window.innerHeight + 0.5); // Normalize Y to [0, 1]
+});
+
+// Log it at intervals
+setInterval(() => {
+  console.log("X:", mouseX, "Y:", mouseY);
+}, 500);
+
+
   //planety
   useEffect(()  => {
     const map = mapRef.current;

@@ -233,7 +233,7 @@ const arc4 = arcCoordinates(
   204,            // end angle
 );
 
-
+console.log(arc2)
 
 const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
   type: 'Feature',
@@ -268,22 +268,11 @@ const arc2 = arcCoordinates(
 
 const arc = arcCoordinates(
   [1, 1],  // centre of the circle your arc curves around
-  23,              // radius
-  204,              // start angle (degrees, 0=north, clockwise)
-  223,            // end angle
-);
-const arc3 = arcCoordinates(
-  [1, 1],  // centre of the circle your arc curves around
-  23,              // radius
+  42,              // radius
   255,              // start angle (degrees, 0=north, clockwise)
-  267,            // end angle
+  270,          // end angle
 );
-const arc4 = arcCoordinates(
-  [1, 1],  // centre of the circle your arc curves around
-  10,              // radius
-  267,              // start angle (degrees, 0=north, clockwise)
-  204,            // end angle
-);
+
 
 
 
@@ -293,15 +282,12 @@ const polygon: GeoJSON.Feature<GeoJSON.Polygon> = {
   geometry: {
     type: 'Polygon',
     coordinates: [[
-    [0.96,0.92],
-    [0.915,0.811],
-    ...arc,
-    [0.797,0.775],
-    ...arc2,
-    [0.8,0.947],
-    ...arc3,
-    [0.91, 1.0],
-    ...arc4
+      [0.8,0.947],
+      [0.793,0.989],
+      [0.8,0.947],
+      [0.708,0.916],
+      [0.64,0.8947],
+      ...arc,
 
     ]],
   },
@@ -316,7 +302,7 @@ const cantolus = CantolusSector();
 const idun = IdunSector();
 const Sectors: FeatureCollection<Geometry> = {
   type: 'FeatureCollection',
-  features: [ cancri, gothmar,cantolus],
+  features: [ cancri, gothmar,cantolus,idun],
 };
 return Sectors;
 
