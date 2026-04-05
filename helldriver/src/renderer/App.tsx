@@ -16,7 +16,8 @@ import { FeatureCollection, Geometry } from 'geojson';
 import { get } from 'http';
 import { features } from 'process';
 import * as turf from '@turf/turf';
-
+import type { Units } from '@turf/helpers';
+import renderSectors from './sectors';
 /**
 * Fetches data from the Helldivers API.
 * https://api.live.prod.thehelldiversgame.com/api/{endpoint}
@@ -181,8 +182,9 @@ const addPlanetsSource = () => {
         }
         
   })
+  // center [lng, lat]
 
-  
+
   map?.addSource('points', {
     type: 'geojson',
     data: geojson,
@@ -190,48 +192,51 @@ const addPlanetsSource = () => {
   });
   const addSectors = () => 
   {
-    map?.addLayer({
+    
+    const center = [1, 1]; // example: Poznań
+    const units: Units = 'kilometers';
+    const radius = 10; // in kilometers
+    const options = {
+      steps: 64,       // more steps = smoother circle
+      units: units 
+    };
+    const circle = turf.circle(center, radius, options);
+ map?.addSource('circle', {
+    type: 'geojson',
+    data: circle
+  });
+ 
+  map?.addLayer({
     id: 'circle-outline',
     type: 'line',
-    source: 'points',
+    source: 'circle',
     paint: {
       'line-color': '#007cbf',
-      'line-width': 20
+      'line-width': 3
     }
   });
   }
   addSectors();
-  
-
-};
-map?.on('load', () => {
-  map.addSource('circle-source', {
+  const sectors = renderSectors(map!);
+   map?.addSource('sectors', {
     type: 'geojson',
-    data: {
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [1, 1] // [lng, lat]
-      },
-      properties: {}
+    data: sectors
+  });
+    map?.addLayer({
+    id: 'sectors-outline',
+    type: 'line',
+    source: 'sectors',
+    paint: {
+      'line-color': '#007cbf',
+      'line-width': 3
     }
   });
 
-  map.addLayer({
-    id: 'circle-layer',
-    type: 'circle',
-    source: 'circle-source',
-    paint: {
-      'circle-pitch-alignment': 'map',  // tilts with the map plane
-  'circle-pitch-scale': 'map',   
-      'circle-radius': 40,        // pixels
-      'circle-color': '#3887be',
-      'circle-opacity': 0.8,
-      'circle-stroke-width': 2,
-      'circle-stroke-color': '#ffffff'
-    }
-  });
-});
+  
+};
+
+
+
 const addPlanetsLayer = (planets : JSON) => 
   {
     const loadIcons = async () => {
@@ -364,213 +369,10 @@ if (map?.isStyleLoaded()) {
       ]
     }
   });
-  /*
-  const loadIcons = async () => {
-    await loadPlanetIcons(map!);
-      map!.addLayer({
-    id: `points-layer${planet.index}`,
-    type: 'symbol',
-    source: `points`,
-    layout: {
-      'icon-image': `${Planet_data[nazwa].biome}`,        // matches the key loaded by loadPlanetIcons
-      'icon-size': 0.11,
-      'icon-anchor': 'bottom',
-      'text-field': Planet_data[nazwa].name,
-      'text-anchor': 'top',
-      'text-offset': [1, 0.5],
-      'text-size': 14,
-      'icon-allow-overlap': true,
-      'text-allow-overlap': true,
-    },
-    paint: {
-      'text-color': '#ffffff',
-      'text-halo-color': '#000000',
-      'text-halo-width': 2,
-    }
-  });;
-  }
-  */
  
-  //loadIcons();
-//console.log(planet);
-//console.log(map!.hasImage(planet.biome));
-//console.log(planetIcons[Planet_data[0].biome]);
-
-      /*
-      const nazwa = planet.index as Planet_data_processed;
-      let BASE_SIZE
-      const upper = document.createElement('div'); //maplibre handler
-      const container = document.createElement('div'); //true container
-      
-      container.style.display = 'flex';
-      container.style.flexDirection = 'column';
-      container.style.alignItems = 'center';
-      container.style.gap = '4px';
-      const img = document.createElement('img'); //planet image
-      const imgWrapper = document.createElement('div');  // wraps the image 
-
-      let zoom = mapRef.current!.getZoom();
-      let scale = Math.pow(2, (zoom - 8) / 2);
-      const name = document.createElement('span'); //planet name  ----------------nazwy planet z planets.json
-      name.textContent = Planet_data[nazwa].name;
-
-      name.className = 'planet-name';
-      name.style = `font-size: 0.9rem`
-      name.style.opacity = '0';
-      name.style.color = 'white';
-      name.style.webkitTextStroke = '0.2px black';
-      name.style.transition = 'opacity 0.7s ease';
-      name.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
-
-      if(planet.index === 0) {
-        //super ziemia
-        img.src = `${planetIcons[Planet_data[0].biome]}`;
-        BASE_SIZE = 50;
-        img.className = 'Super-Earth';
-        img.style.width = 43 + "px";
-        img.style.height = 53 + "px";
-        img.style.transformOrigin = 'bottom center';
-        name.style.textShadow = `#ffcc00 1px 0 10px`;
-        
-
-      }
-      else if(planet.index === 115){
-        //penta
-          BASE_SIZE = 20;
-          console.log(Planet_data[nazwa].name)
-          console.log(`${Planet_data[64].biome}`);
-          img.src=`${planetIcons[Planet_data[64].biome]}`;
-          img.className="black_hole_penta"
-        img.style.width = BASE_SIZE + "px";
-        img.style.height = BASE_SIZE + "px"; 
-        }
-      else if(planet.index === 51 || planet.index === 85 || planet.index === 127){
-        //fractured planets
-          BASE_SIZE = 20;
-          console.log(Planet_data[nazwa].name)
-          console.log(`${Planet_data[64].biome}`);
-          img.src=`${planetIcons["fractured_planet"]}`;
-          img.className="fractured_planet"
-        img.style.width = BASE_SIZE + "px";
-        img.style.height = BASE_SIZE + "px"; 
-        }
-      else if(planet.index === 64){
-        //meridia
-          BASE_SIZE = 20;
-          console.log(Planet_data[nazwa].name)
-          console.log(`${Planet_data[64].biome}`);
-          img.src=`${planetIcons[Planet_data[64].biome]}`;
-          img.className="black_hole_penta"
-        img.style.width = BASE_SIZE + "px";
-        img.style.height = BASE_SIZE + "px"; 
-        }
-      else if(Planet_data[nazwa].name==""){
-          BASE_SIZE = 0;
-          img.src=""
-          img.className="empty"
-          img.style.width = '0px';
-          img.style.height = '0px'; 
-        }
-        else{
-        BASE_SIZE = 15;
-        img.src = `${planetIcons[Planet_data[nazwa].biome]}`;
-        img.className = 'planet';
-        img.style.width = BASE_SIZE + "px";
-        img.style.height = BASE_SIZE + "px"; 
-        img.style.transformOrigin = 'bottom center';
-           }
-      
-
-      //faction logic
-
-      if(Wardata.planetStatus[planet.index].owner == 1){
-
-      }
-      switch (Wardata.planetStatus[planet.index].owner) {
-          case 1:
-            // do something
-            break;
-          case 2:
-            name.style.color='yellow'
-            break;
-          case 3:
-            name.style.color='#b60000'
-            break;
-          case 4:
-            name.style.color='#ab00fd'
-            break;
-          default:
-            console.log(Wardata.planetStatus[planet.index].owner)
-            break;
-        }
-
-
-      //zoom logic
-      const updateScale = () => {
-        scale = Math.pow(2, (zoom - 8) / 2);
-        zoom = mapRef.current!.getZoom();
-        img.style.transform = `${img.style.transform.replace(/\s*scale\([^)]*\)/, '')} scale(${scale})`;
-        name.style.fontSize= `${0.58 * Math.sqrt(scale)}rem`;
-        
-      };
-
-      imgWrapper.style.width = `${BASE_SIZE}px`;
-      imgWrapper.style.height = `${BASE_SIZE}px`;
-      imgWrapper.style.display = 'flex';
-      imgWrapper.style.alignItems = 'center';
-      imgWrapper.style.justifyContent = 'center';
-      imgWrapper.style.overflow = 'visible';
-
-      mapRef.current!.on('zoom', updateScale);
-      mapRef.current!.on('zoomend', updateScale);
-
-      mapRef.current!.on('zoomend', () => {
-        const zoom = mapRef.current!.getZoom();
-        check_Name_Visibility(zoom, name);
-      });
-
-
-      
-      //console.log(planet);
-     // console.log(Planet_data[nazwa].name);
-      imgWrapper.appendChild(img);
-      
-      container.appendChild(imgWrapper);
-      container.appendChild(name);
-      upper.appendChild(container);
-      
-      if(planet.index !=64) {
-      const marker = new maplibregl.Marker({ element: container })
-        .setLngLat([planet.position.x + 1, planet.position.y + 1])
-        .addTo(mapRef.current!);
-      }
-      else{
-        //pozycja meridii w grze jest inna niż w api, więc trzeba to poprawić ręcznie
-        const marker = new maplibregl.Marker({ element: container })
-        .setLngLat([0.269 + 1, 0.116 + 1])
-        .addTo(mapRef.current!);
-        
-      }
-      */
-      //updateScale(); // set correct size on init
-      //generate hyperlanes
       
     });
     
-    const check_Name_Visibility = (CurZoom:number, name:HTMLSpanElement) => {
-      if(CurZoom <= 9.0){
-        name.style.opacity = '0';
-        console.log("ppo") 
-      }
-      else{
-        console.log("oop");
-        name.style.opacity = '1';
-      }
-
-    }
-
-  
-
 
   }, [apiData, isMapLoaded]);
   return (
