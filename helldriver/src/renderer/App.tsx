@@ -17,7 +17,7 @@ import { get } from 'http';
 import { features } from 'process';
 import * as turf from '@turf/turf';
 import type { Units } from '@turf/helpers';
-import renderSectors from './sectors';
+import sectorsPNG from '../../assets/planets/planet_icons/empty_map.png';
 /**
 * Fetches data from the Helldivers API.
 * https://api.live.prod.thehelldiversgame.com/api/{endpoint}
@@ -80,11 +80,7 @@ mapRef.current = new maplibregl.Map({
       }
     },
     layers: [
-      {
-        id: 'bg',
-        type: 'raster',
-        source: 'bg'
-      }
+
     ]
   },
   center: [0.5, 0.5],
@@ -206,52 +202,31 @@ const addPlanetsSource = () => {
     data: geojson,
     cluster: false
   });
-  const addSectors = () => 
-  {
-    
-    const center = [1, 1]; // example: Poznań
-    const units: Units = 'kilometers';
-    const radius = 10; // in kilometers
-    const options = {
-      steps: 64,       // more steps = smoother circle
-      units: units 
-    };
-    const circle = turf.circle(center, radius, options);
- map?.addSource('circle', {
-    type: 'geojson',
-    data: circle
-  });
  
-  map?.addLayer({
-    id: 'circle-outline',
-    type: 'line',
-    source: 'circle',
-    paint: {
-      'line-color': '#007cbf',
-      'line-width': 3
-    }
-  });
-  }
-  addSectors();
-  const sectors = renderSectors(map!);
-   map?.addSource('sectors', {
-    type: 'geojson',
-    data: sectors
-  });
-    map?.addLayer({
-    id: 'sectors-outline',
-    type: 'line',
-    source: 'sectors',
-    paint: {
-      'line-color': '#007cbf',
-      'line-width': 3
-    }
-  });
-
   
 };
 
+map?.on('load', () => {
+  map.addSource('image-source', {
+    type: 'image',
+    url: sectorsPNG,
+    coordinates: [
+      [-1+1,  1+1],  // top-left
+      [ 1+1,  1+1],  // top-right
+      [ 1+1, -1+1],  // bottom-right
+      [-1+1, -1+1],  // bottom-left
+    ]
+  });
 
+  map.addLayer({
+    id: 'image-layer',
+    type: 'raster',
+    source: 'image-source',
+    paint: {
+      'raster-opacity': 0.85
+    }
+  });
+});
 
 const addPlanetsLayer = (planets : JSON) => 
   {
