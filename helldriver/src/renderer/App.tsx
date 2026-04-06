@@ -161,6 +161,7 @@ const addPlanetsSource = () => {
           icon: Planet_data[nazwa].biome,
           name: Planet_data[nazwa].name,
           faction: Wardata.planetStatus[planet.index].owner
+          
         }
       };
       
@@ -171,21 +172,34 @@ const addPlanetsSource = () => {
   function DefenseCampaigns(campaign: any,planets:any) {
     console.log("defenses");
     console.log(campaign);
-    let marker = new Marker({
-    color: "#f00c0c",
-    draggable: true
-  }).setLngLat([planets[campaign.planetIndex].position.x+1, planets[campaign.planetIndex].position.y+1])
-  .addTo(map!);
 
-const pastDate: Date = new Date("2024-02-13T18:17:30");
+
+const pastDate: Date = new Date("2024-02-13T18:37:30");
 
 const now: Date = new Date();
+  let UpperText = '';
+  switch(campaign.race){
+  case 2: {
+     UpperText = 'TERMINID ATTACK'
+    console.log(UpperText)
+    break;
+  }
+  case 3: {
+     UpperText = 'AUTOMATON ATTACK'
+    break;
+  }
+  case 4: {
+     UpperText = 'ILLUMINATE ATTACK'
+    break;
+  }
+}
+
 
 const secondsPassed: number = Math.floor(
   (now.getTime() - pastDate.getTime()) / 1000
 );
 let final = Math.max(campaign.expireTime - secondsPassed); // remaining seconds
-
+final += 84600
 // Convert to hours, minutes, seconds
 let hours = Math.floor(final / 3600);
 let minutes = Math.floor((final % 3600) / 60);
@@ -195,42 +209,49 @@ let seconds = Math.floor(final % 60);
 let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
   .map(unit => String(unit).padStart(2, '0'))
   .join(':');
+  console.log(campaign.expireTime)
+  console.log(secondsPassed)
+  console.log(final)
+  
   setInterval(() => {
-    final +=1;
+    final -=1;
     hours = Math.floor(final / 3600);
     minutes = Math.floor((final % 3600) / 60);
     seconds = Math.floor(final % 60);
     formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
   .map(unit => String(unit).padStart(2, '0'))
   .join(':');
-    timer.textContent = `${formatted} left`;
+    timer.textContent = `${UpperText}`;
+        const br = document.createElement('br'); // line break
+        timer.appendChild(br);
+        const timeText = document.createTextNode(`${formatted} left`); // second line
+        timer.appendChild(timeText);
   }, 1000);
-
 
 
   const el = document.createElement('div');
         el.className = 'marker';
-       const timer = document.createElement('p');
-        timer.textContent = `${formatted} left`;
-        el.style.width = `100px`;
-        el.style.height = `40px`;
+       const timer = document.createElement('span');
+        timer.textContent = `${UpperText}`;
+        const br = document.createElement('br'); // line break
+        timer.appendChild(br);
+        const timeText = document.createTextNode(`${formatted} left`); // second line
+        timer.appendChild(timeText);
+        el.style.height = 'px';
+        el.style.marginBottom = `20px`;
+        el.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
         el.appendChild(timer)
  
-        setInterval(count, 1000);
+        
 
-function count() {
-      
-}
-        // add marker to map
+
         new maplibregl.Marker({element: el})
-            .setLngLat([planets[campaign.planetIndex].position.x+1, planets[campaign.planetIndex].position.y+1])
+            .setLngLat([planets[campaign.planetIndex].position.x+1, planets[campaign.planetIndex].position.y+1.02])
             .addTo(map!);
+
+
   }
-  const defenses: number[] = [];
-  Wardata.planetEvents.map((campaign: any) => {
-    
-    DefenseCampaigns(campaign,planets)
-  });
+
 
 
   console.log("points added")
@@ -256,10 +277,15 @@ function count() {
   map?.addSource('points', {
     type: 'geojson',
     data: geojson,
-    cluster: false
+    cluster: false,
+    
   });
  
-  
+    Wardata.planetEvents.map((campaign: any) => {
+    
+    DefenseCampaigns(campaign,planets)
+  });
+
 };
 
 map?.on('load', () => {
@@ -358,13 +384,13 @@ const addPlanetsLayer = (planets : JSON) =>
       },
       paint: {
         'text-color': [
-          'match',
-          ['get', 'faction'],  
-          2, 'yellow',    
-          3, '#b60000', 
-          4, '#ab00fd',
-          /* default color */ '#ffffff' 
-        ],
+                'match',
+                ['get', 'faction'],
+                2, 'yellow',
+                3, '#b60000',
+                4, '#ab00fd',
+                '#ffffff'
+            ],
         'text-halo-color': [
           'match',
         ['get', 'id'],  
