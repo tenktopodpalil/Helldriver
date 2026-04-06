@@ -1,11 +1,10 @@
 import { MemoryRouter as Router, Routes, Route, data, useLocation } from 'react-router-dom';
-import icon from '../../assets/icon.svg';
 import MapBackground from '../../assets/circle_PNG63.png';
 import Super_Ziemia from '../../assets/Super_Ziemia.png';
 import Planet_data from '../../assets/planets/planets.json';
 import './App.css';
 import { use, useState, useRef, useEffect } from 'react';
-import maplibregl from 'maplibre-gl';
+import maplibregl, { Marker } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import generate_Hyperlanes from './Hyperlanes';
 import { Console } from 'console';
@@ -113,16 +112,7 @@ const LoadIcons = async () =>
 let mouseX = 0;
 let mouseY = 0;
 
-// Track latest mouse position
-document.addEventListener("mousemove", (event) => {
-  mouseX = (event.pageX / window.innerWidth + 0.5); // Normalize X to [0, 1]
-  mouseY =  (event.pageY / window.innerHeight + 0.5); // Normalize Y to [0, 1]
-});
 
-// Log it at intervals
-setInterval(() => {
-  console.log("X:", mouseX, "Y:", mouseY);
-}, 500);
 
 
   //planety
@@ -138,10 +128,11 @@ setInterval(() => {
 
 
 const addPlanetsSource = () => {
-  
+
   const geojson: FeatureCollection<Geometry> = {
     type: 'FeatureCollection',
     features: planets?.map((planet: any) => {
+      
       /*
           console.log(planets)
     console.log(WarapiData)
@@ -177,6 +168,71 @@ const addPlanetsSource = () => {
   ) ?? []
 
   };
+  function DefenseCampaigns(campaign: any,planets:any) {
+    console.log("defenses");
+    console.log(campaign);
+    let marker = new Marker({
+    color: "#f00c0c",
+    draggable: true
+  }).setLngLat([planets[campaign.planetIndex].position.x+1, planets[campaign.planetIndex].position.y+1])
+  .addTo(map!);
+
+const pastDate: Date = new Date("2024-02-13T18:17:30");
+
+const now: Date = new Date();
+
+const secondsPassed: number = Math.floor(
+  (now.getTime() - pastDate.getTime()) / 1000
+);
+let final = Math.max(campaign.expireTime - secondsPassed); // remaining seconds
+
+// Convert to hours, minutes, seconds
+let hours = Math.floor(final / 3600);
+let minutes = Math.floor((final % 3600) / 60);
+let seconds = Math.floor(final % 60);
+
+// Format with leading zeros
+let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
+  .map(unit => String(unit).padStart(2, '0'))
+  .join(':');
+  setInterval(() => {
+    final +=1;
+    hours = Math.floor(final / 3600);
+    minutes = Math.floor((final % 3600) / 60);
+    seconds = Math.floor(final % 60);
+    formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
+  .map(unit => String(unit).padStart(2, '0'))
+  .join(':');
+    timer.textContent = `${formatted} left`;
+  }, 1000);
+
+
+
+  const el = document.createElement('div');
+        el.className = 'marker';
+       const timer = document.createElement('p');
+        timer.textContent = `${formatted} left`;
+        el.style.width = `100px`;
+        el.style.height = `40px`;
+        el.appendChild(timer)
+ 
+        setInterval(count, 1000);
+
+function count() {
+      
+}
+        // add marker to map
+        new maplibregl.Marker({element: el})
+            .setLngLat([planets[campaign.planetIndex].position.x+1, planets[campaign.planetIndex].position.y+1])
+            .addTo(map!);
+  }
+  const defenses: number[] = [];
+  Wardata.planetEvents.map((campaign: any) => {
+    
+    DefenseCampaigns(campaign,planets)
+  });
+
+
   console.log("points added")
   console.log(geojson);
   
@@ -346,7 +402,7 @@ if (map?.isStyleLoaded()) {
        
     planets?.forEach((planet: any) => {
       const nazwa = planet.index as Planet_data_processed;
-      generate_Hyperlanes(planet,mapRef.current!,planets);
+      generate_Hyperlanes(planet,mapRef.current!,planets,Wardata);
       map!.addSource(`points${planet.index}`, {
     type: 'geojson',
     data: {

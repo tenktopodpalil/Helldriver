@@ -1,6 +1,6 @@
 import maplibregl from 'maplibre-gl';
 
-export default function generateHyperlanes(planet: any, map: maplibregl.Map,planets:any) 
+export default function generateHyperlanes(planet: any, map: maplibregl.Map,planets:any,WarData:any) 
 {
     //console.log(planet.waypoints.length);
 if(planet.waypoints.length >= 1){
@@ -13,6 +13,16 @@ if(planet.waypoints.length >= 1){
             [planet.x, planet.y],
             [destination.x, destination.y]
         ];
+        
+     let color = '#ffffff'; 
+     if (WarData.planetStatus[planet.index].owner === 2) {
+        color = 'yellow';
+    } else if (WarData.planetStatus[planet.index].owner === 3) {
+        color = '#b60000';
+    } else if (WarData.planetStatus[planet.index].owner === 4) {
+        color = '#ab00fd';
+    }
+
 const sourceId = `route${planet.index}-${waypoint}`;
 const layerId = `${sourceId}-2`;
 
@@ -21,7 +31,7 @@ if (!map.getSource(sourceId)) {
         type: 'geojson',
         data: {
             type: 'Feature',
-            properties: {},
+            properties: {color: color},
             geometry: {
                 type: 'LineString',
                 coordinates: [
@@ -43,7 +53,7 @@ if (!map.getLayer(layerId)) {
             'line-cap': 'round'
         },
         paint: {
-            'line-color': '#ffffff',
+            'line-color': ['get', 'color'],
             'line-width': 3,
             'line-opacity': 0.9
         }
