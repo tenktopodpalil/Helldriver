@@ -17,6 +17,10 @@ import { features } from 'process';
 import * as turf from '@turf/turf';
 import type { Units } from '@turf/helpers';
 import sectorsPNG from '../../assets/planets/planet_icons/empty_map.png';
+import Terminids_icon from '../../assets/planets/planet_icons/Terminids_Icon.png';
+import Automatons_icon from '../../assets/planets/planet_icons/Automatons_Icon.png';
+import Illuminate_icon from '../../assets/planets/planet_icons/Illuminate_Icon.png';
+
 /**
 * Fetches data from the Helldivers API.
 * https://api.live.prod.thehelldiversgame.com/api/{endpoint}
@@ -93,13 +97,7 @@ mapRef.current = new maplibregl.Map({
     [MAX+1, MAX+1]
   ]
 });
-const LoadIcons = async () => 
-  {
-    //await loadPlanetIcons(mapRef.current!);
-  }
-  LoadIcons()
 
-// Add the point after the map loads
     
 
     return () => {
@@ -275,7 +273,8 @@ let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
           faction: 1
         }
         
-  })
+  }
+)
   // center [lng, lat]
 
 
@@ -285,6 +284,7 @@ let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
     cluster: false,
     
   });
+
  
     Wardata.planetEvents.map((campaign: any) => {
     
@@ -293,6 +293,7 @@ let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
 
 };
 
+//technical things to load
 map?.on('load', () => {
   map.addSource('image-source', {
     type: 'image',
@@ -314,6 +315,7 @@ map?.on('load', () => {
     }
   });
 });
+
 
 const addPlanetsLayer = (planets : JSON) => 
   {
@@ -420,8 +422,104 @@ const addPlanetsLayer = (planets : JSON) =>
       },
       
     });
+
+
+
+
+// Rotate a point [x, y] around a center [cx, cy] by angleDeg degrees
+function rotatePoint(
+  point: [number, number],
+  center: [number, number],
+  angleDeg: number
+): [number, number] {
+  const angleRad = (angleDeg * Math.PI) / 180; // convert degrees to radians
+  const [x, y] = point;
+  const [cx, cy] = center;
+
+  const dx = x - cx;
+  const dy = y - cy;
+
+  const rx = dx * Math.cos(angleRad) - dy * Math.sin(angleRad) + cx;
+  const ry = dx * Math.sin(angleRad) + dy * Math.cos(angleRad) + cy;
+
+  return [rx, ry];
+}
+
+const centerT: [number, number] = [2.05, 1.5];
+const halfSize = 0.15;
+
+const squareCoordsT: [number, number][] = [
+  [centerT[0] - halfSize, centerT[1] + halfSize], // top-left
+  [centerT[0] + halfSize, centerT[1] + halfSize], // top-right
+  [centerT[0] + halfSize, centerT[1] - halfSize], // bottom-right
+  [centerT[0] - halfSize, centerT[1] - halfSize], // bottom-left
+];
+
+const rotatedCoordsT: [number, number][] = squareCoordsT.map(pt =>
+  rotatePoint(pt, centerT, -65)
+);
+const centerA: [number, number] = [0.3, 1.95];
+
+
+const squareCoordsA: [number, number][] = [
+  [centerA[0] - halfSize, centerA[1] + halfSize], // top-left
+  [centerA[0] + halfSize, centerA[1] + halfSize], // top-right
+  [centerA[0] + halfSize, centerA[1] - halfSize], // bottom-right
+  [centerA[0] - halfSize, centerA[1] - halfSize], // bottom-left
+];
+
+const rotatedCoordsA: [number, number][] = squareCoordsA.map(pt =>
+  rotatePoint(pt, centerA, 37)
+);
+const centerI: [number, number] = [1, -0.17];
+
+
+const squareCoordsI: [number, number][] = [
+  [centerI[0] - halfSize, centerI[1] + halfSize], // top-left
+  [centerI[0] + halfSize, centerI[1] + halfSize], // top-right
+  [centerI[0] + halfSize, centerI[1] - halfSize], // bottom-right
+  [centerI[0] - halfSize, centerI[1] - halfSize], // bottom-left
+];
+
+
+
+
+    const images = [
+  { url: Terminids_icon, coords: rotatedCoordsT },
+  { url: Automatons_icon, coords: rotatedCoordsA },
+  { url: Illuminate_icon, coords: squareCoordsI  }
+];
+
+
+  images.forEach((img, index) => {
+    const sourceId = `image-source-${index}`;
+    const layerId = `image-layer-${index}`;
+
+    // Add the image source
+    map?.addSource(sourceId, {
+      type: 'image',
+      url: img.url,
+      coordinates: img.coords as [[number, number], [number, number], [number, number], [number, number]]
+    });
+
+    // Add the corresponding layer
+    map?.addLayer({
+      id: layerId,
+      type: 'raster',
+      source: sourceId,
+      paint: {
+        
+      }
+    });
+  });
+  console.log("edge icons loaded")
+
+
     }
     loadIcons();
+
+
+
   }
 mapRef.current!.on('zoomend', () => console.log(mapRef.current!.getZoom()));
 // If the style is already loaded, add immediately; otherwise wait for it

@@ -25,6 +25,9 @@ import unknown from '../../assets/planets/planet_icons/unknown.webp';
 import fractured_planet from '../../assets/planets/planet_icons/fractured_planet.png';
 import mars from '../../assets/planets/planet_icons/mars.png';
 import sectors from '../../assets/planets/planet_icons/empty_map.png'
+import Terminids_icon from '../../assets/planets/planet_icons/Terminids_Icon.png';
+import Automatons_icon from '../../assets/planets/planet_icons/Automatons_Icon.png';
+import Illuminate_icon from '../../assets/planets/planet_icons/Illuminate_Icon.png';
 
 export const planetIcons: Record<string, string> = {
   arctic_glacier_base: arcticGlacierBase,
@@ -53,4 +56,7 @@ export const planetIcons: Record<string, string> = {
   fractured_planet: fractured_planet,
   mars: mars,
   sectors: sectors,
+  Terminids_icon: Terminids_icon,
+  Automatons_icon: Automatons_icon,
+  Illuminate_icon: Illuminate_icon,
 };
