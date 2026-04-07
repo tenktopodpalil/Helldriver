@@ -240,6 +240,11 @@ let formatted = [Math.abs(hours), Math.abs(minutes), Math.abs(seconds)]
         el.style.height = 'px';
         el.style.marginBottom = `20px`;
         el.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        el.style.borderRadius = '2px';
+        el.style.borderColor = 'rgba(216, 18, 18, 0.8)';
+        el.style.borderWidth = '1px';
+        el.style.borderStyle = 'solid';
+       
         el.appendChild(timer)
  
         
